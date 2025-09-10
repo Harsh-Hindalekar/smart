@@ -1,31 +1,26 @@
 from fastapi import FastAPI
-from pydantic import BaseModel
+from fastapi.middleware.cors import CORSMiddleware
+from app.database import Base, engine
+from app.routes import routes 
+from app.models import models 
 
-app = FastAPI(title="My FastAPI App", version="1.0")
+# Create all tables
+Base.metadata.create_all(bind=engine)
 
-# Sample data model
-class Item(BaseModel):
-    name: str
-    description: str | None = None
-    price: float
-    in_stock: bool
+app = FastAPI(
+    title="LIFECARE API",
+    description="Backend for the LIFECARE project",
+    version="1.0.0"
+)
 
-# Root endpoint
-@app.get("/")
-def read_root():
-    return {"message": "Welcome to FastAPI!"}
+# CORS settings
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],  # frontend URL
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-# Example GET endpoint
-@app.get("/items/{item_id}")
-def read_item(item_id: int):
-    return {"item_id": item_id, "message": "This is a GET request"}
-
-# Example POST endpoint
-@app.post("/items/")
-def create_item(item: Item):
-    return {"message": "Item created successfully", "item": item}
-
-# Example health check endpoint
-@app.get("/health")
-def health_check():
-    return {"status": "ok"}
+# Include routes
+app.include_router(routes.router, tags=["public"])

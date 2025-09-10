@@ -10,4 +10,5 @@ class User(Base):
     name = Column(String(100), nullable=False)
     email = Column(String(255), unique=True, nullable=False)
     username = Column(String(100), unique=True, nullable=False)
+    password = Column(String(255), nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
