@@ -6,7 +6,6 @@ import os
 from dotenv import load_dotenv  
 
 load_dotenv()
-# load_dotenv(dotenv_path=r"C:\Users\ghara\OneDrive\Desktop\parth\VIGNESH_LIFECARE_BACKEND\lifecare_backend\app\.env")
 
 
 # MySQL DB connection string
