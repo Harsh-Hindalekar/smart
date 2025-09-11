@@ -21,8 +21,8 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
 # Login route
 @router.post("/login")
 def login(user: UserLogin, db: Session = Depends(get_db)):
-    db_user = crud.get_user_by_email(db, user.email)
+    db_user = crud.get_user_by_username(db, user.username)
     if not db_user or not crud.verify_password(user.password, db_user.password):
-        raise HTTPException(status_code=400, detail="Invalid email or password")
+        raise HTTPException(status_code=400, detail="Invalid username or password")
     
     return {"message": f"Welcome {db_user.name}"}

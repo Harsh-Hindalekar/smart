@@ -10,3 +10,7 @@ venv/
 
 # Environment
 .env
+
+# Files
+database.py
+
