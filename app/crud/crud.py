@@ -45,18 +45,21 @@ def get_user_by_id(db: Session, user_id: str) -> User:
 # Content CRUD
 # -----------------------------
 
-def create_content(db: Session, title: str, description: str, type: str, user_id: str) -> Content:
+def create_content(db: Session, title: str, description: str, user_id: str) -> Content:
     new_content = Content(
         title=title,
         description=description,
-        type=type,
         user_id=user_id,
-        # created_at=datetime.utcnow()
     )
     db.add(new_content)
     db.commit()
     db.refresh(new_content)
     return new_content
+
+def get_contents(db: Session, user_id: int):
+    return db.query(Content).filter(
+        Content.user_id == user_id
+    ).all()
 
 def get_all_contents(db: Session):
     return db.query(Content).all()
