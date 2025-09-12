@@ -35,14 +35,14 @@ class UserResponse(BaseModel):
 class ContentCreate(BaseModel):
     title: str
     description: Optional[str] = None
-    type: str
+    # type: str
 
 
 class ContentResponse(BaseModel):
     id: int
     title: str
     description: Optional[str] = None
-    type: str
+    # type: str
     user_id: str   # foreign key to User
 
     class Config:

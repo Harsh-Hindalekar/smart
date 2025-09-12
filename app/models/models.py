@@ -24,11 +24,10 @@ class Content(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     title = Column(String(255), nullable=False)
     description = Column(String(1000))
-    type = Column(String(50))  # Blog, Article, Motivational Post
+    # type = Column(String(50))  # Blog, Article, Motivational Post
 
     # Foreign Key to User
     user_id = Column(String(36), ForeignKey('users.id'), nullable=False)
-
     # Relationship: Each content has one author
     author = relationship("User", back_populates="contents")
 

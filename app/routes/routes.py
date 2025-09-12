@@ -9,6 +9,8 @@ from app.auth.auth import get_current_user
 from app.schemas.schemas import UserCreate, UserLogin, UserResponse, ContentCreate, ContentResponse
 from datetime import timedelta
 from app.auth.auth import create_token
+from fastapi.security import OAuth2PasswordRequestForm
+
 
 ACCESS_TOKEN_EXPIRE_MINUTES = 1080
 
@@ -32,18 +34,17 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
 # -----------------------------
 
 @router.post("/login")
-def login(user: UserLogin, db: Session = Depends(get_db)):
-    db_user = crud.get_user_by_username(db, user.username)
-    if not db_user or not crud.verify_password(user.password, db_user.password):
+def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+    db_user = crud.get_user_by_username(db, form_data.username)
+    if not db_user or not crud.verify_password(form_data.password, db_user.password):
         raise HTTPException(status_code=400, detail="Invalid username or password")
-    
-    # Create JWT token
+
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_token(
         data={"sub": db_user.username},
         expires_delta=access_token_expires
     )
-    
+
     return {"access_token": access_token, "token_type": "bearer"}
 
 
@@ -52,35 +53,27 @@ def login(user: UserLogin, db: Session = Depends(get_db)):
 # Create a new content post (protected route)
 # -----------------------------
 @router.post("/contents/", response_model=ContentResponse)
-def create_content(content: ContentCreate, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
-    new_content = Content(
+def create_content(
+    content: ContentCreate,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    new_content = crud.create_content(
+        db,
         title=content.title,
         description=content.description,
         type=content.type,
         user_id=current_user.id
     )
-
-    db.add(new_content)
-    db.commit()
-    db.refresh(new_content)
     return new_content
 
 
-# -----------------------------
-# Get all content posts
-# -----------------------------
+# Get all contents
 @router.get("/contents/", response_model=List[ContentResponse])
 def get_contents(db: Session = Depends(get_db)):
-    contents = db.query(Content).all()
-    return contents
+    return crud.get_all_contents(db)
 
-
-# -----------------------------
-# Get content posts by user
-# -----------------------------
+# Get contents by user
 @router.get("/users/{user_id}/contents/", response_model=List[ContentResponse])
 def get_user_contents(user_id: str, db: Session = Depends(get_db)):
-    user = db.query(User).filter(User.id == user_id).first()
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-    return user.contents
+    return crud.get_contents_by_user(db, user_id)
