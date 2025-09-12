@@ -7,7 +7,6 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-
 # MySQL DB connection string
 DATABASE_URL = os.getenv("DATABASE_URL")
 # Create SQLAlchemy engine  by removing ssl_args
