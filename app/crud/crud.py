@@ -68,3 +68,11 @@ def get_content_by_id(db: Session, content_id: str):
 
 def get_contents_by_user(db: Session, user_id: str):
     return db.query(Content).filter(Content.user_id == user_id).all()
+
+def delete_content(db: Session, content_id: str):
+    content = db.query(Content).filter(Content.id == content_id).first()
+    if not content:
+        raise Exception("Content not found")
+
+    db.delete(content)
+    db.commit()

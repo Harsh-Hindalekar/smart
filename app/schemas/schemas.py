@@ -71,3 +71,13 @@ class EmergencyContactResponse(BaseModel):
 # -----------------------------
 class UserWithContents(UserResponse):
     contents: List[ContentResponse] = []  # user -> list of content
+
+# -----------------------------
+# AI BOT
+# -----------------------------
+class QuestionRequest(BaseModel):
+    question: str
+
+
+class AnswerResponse(BaseModel):
+    answer: str
