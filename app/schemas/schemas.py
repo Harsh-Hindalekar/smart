@@ -33,14 +33,14 @@ class UserResponse(BaseModel):
 # Content Schemas
 # -----------------------------
 class ContentCreate(BaseModel):
-    title: str
+    # title: str
     description: Optional[str] = None
     # type: str
 
 
 class ContentResponse(BaseModel):
-    id: int
-    title: str
+    # id: int
+    # title: str
     description: Optional[str] = None
     # type: str
     user_id: str   # foreign key to User

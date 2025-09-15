@@ -50,7 +50,7 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
 # Create a new content post (protected route by user)
 # -----------------------------
 
-@router.post("/contents/", response_model=ContentResponse)
+@router.post("/contents", response_model=ContentResponse)
 def create_content(
     content: ContentCreate,
     current_user: User = Depends(get_current_user),
@@ -58,7 +58,6 @@ def create_content(
 ):
     new_content = crud.create_content(
         db,
-        title=content.title,
         description=content.description,
         user_id=current_user.id
     )
@@ -68,7 +67,7 @@ def create_content(
 # Get content post by user itself (protected route by user)
 # -----------------------------
 
-@router.get("/contents/", response_model=List[ContentResponse])
+@router.get("/contents", response_model=List[ContentResponse])
 def read_contents(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
@@ -81,11 +80,11 @@ def read_contents(
 # -----------------------------
 
 # Get content post of specific user by user_id (protected route used by admin)
-@router.get("/admin/users/{user_id}/contents/", response_model=List[ContentResponse])
+@router.get("/admin/users/{user_id}/contents", response_model=List[ContentResponse])
 def get_user_contents(user_id: str, db: Session = Depends(get_db)):
     return crud.get_contents_by_user(db, user_id)
 
 # Get content post (protected route used by admin)
-@router.get("/admin/contents/", response_model=List[ContentResponse])
+@router.get("/admin/contents", response_model=List[ContentResponse])
 def get_contents(db: Session = Depends(get_db)):
     return crud.get_all_contents(db)

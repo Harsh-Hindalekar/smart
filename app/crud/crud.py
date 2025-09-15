@@ -45,9 +45,8 @@ def get_user_by_id(db: Session, user_id: str) -> User:
 # Content CRUD
 # -----------------------------
 
-def create_content(db: Session, title: str, description: str, user_id: str) -> Content:
+def create_content(db: Session, description: str, user_id: str) -> Content:
     new_content = Content(
-        title=title,
         description=description,
         user_id=user_id,
     )
