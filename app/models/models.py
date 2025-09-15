@@ -21,9 +21,9 @@ class User(Base):
 class Content(Base):
     __tablename__ = "contents"
     
-    # id = Column(Integer, primary_key=True, autoincrement=True)
+    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     # title = Column(String(255), nullable=False)
-    description = Column(String(1000),  primary_key=True)
+    description = Column(String(1000), nullable=False)
 
     # Foreign Key to User
     user_id = Column(String(36), ForeignKey('users.id'), nullable=False)
