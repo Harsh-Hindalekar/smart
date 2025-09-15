@@ -22,7 +22,7 @@ class Content(Base):
     __tablename__ = "contents"
     
     id = Column(Integer, primary_key=True, autoincrement=True)
-    title = Column(String(255), nullable=False)
+    # title = Column(String(255), nullable=False)
     description = Column(String(1000))
 
     # Foreign Key to User
