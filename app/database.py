@@ -5,8 +5,7 @@ from sqlalchemy.orm import sessionmaker
 import os
 from dotenv import load_dotenv  
 
-load_dotenv()
-load_dotenv(dotenv_path=r"C:\Users\ghara\OneDrive\Desktop\parth\harsh_smart\app\.env")
+load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), ".env"))
 
 
 # MySQL DB connection string
