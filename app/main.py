@@ -9,7 +9,7 @@ Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
     title="GESTURE API",
-    description="Backend for the LIFECARE project",
+    description="Backend for the project",
     version="1.0.0"
 )
 
