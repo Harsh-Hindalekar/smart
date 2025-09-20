@@ -8,7 +8,7 @@ from app.models import models
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
-    title="LIFECARE API",
+    title="GESTURE API",
     description="Backend for the LIFECARE project",
     version="1.0.0"
 )

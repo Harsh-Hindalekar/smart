@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from passlib.context import CryptContext
 from datetime import datetime
-from app.models.models import User, Content
+from app.models.models import User
 
 # Password hashing
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -39,40 +39,3 @@ def get_user_by_username(db: Session, username: str) -> User:
 
 def get_user_by_id(db: Session, user_id: str) -> User:
     return db.query(User).filter(User.id == user_id).first()
-
-
-# -----------------------------
-# Content CRUD
-# -----------------------------
-
-def create_content(db: Session, description: str, user_id: str) -> Content:
-    new_content = Content(
-        description=description,
-        user_id=user_id,
-    )
-    db.add(new_content)
-    db.commit()
-    db.refresh(new_content)
-    return new_content
-
-def get_contents(db: Session, user_id: int):
-    return db.query(Content).filter(
-        Content.user_id == user_id
-    ).all()
-
-def get_all_contents(db: Session):
-    return db.query(Content).all()
-
-def get_content_by_id(db: Session, content_id: str):
-    return db.query(Content).filter(Content.id == content_id).first()
-
-def get_contents_by_user(db: Session, user_id: str):
-    return db.query(Content).filter(Content.user_id == user_id).all()
-
-def delete_content(db: Session, content_id: str):
-    content = db.query(Content).filter(Content.id == content_id).first()
-    if not content:
-        raise Exception("Content not found")
-
-    db.delete(content)
-    db.commit()

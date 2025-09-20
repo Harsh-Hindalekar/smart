@@ -13,27 +13,3 @@ class User(Base):
     email = Column(String(255), unique=True, nullable=False)
     password = Column(String(255), nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
-
-    # Relationship: One user → many content posts
-    contents = relationship("Content", back_populates="author")
-
-
-class Content(Base):
-    __tablename__ = "contents"
-    
-    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
-    # title = Column(String(255), nullable=False)
-    description = Column(String(1000), nullable=False)
-
-    # Foreign Key to User
-    user_id = Column(String(36), ForeignKey('users.id'), nullable=False)
-    # Relationship: Each content has one author
-    author = relationship("User", back_populates="contents")
-
-
-class EmergencyContact(Base):
-    __tablename__ = "emergency_contacts"
-    
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    helpline_name = Column(String(255))
-    helpline_number = Column(String(50))
