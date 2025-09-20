@@ -6,7 +6,7 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 from app.database import get_db
-from app.models.models import User
+from app.models.models import User    # add models when newly created
 from app.crud import crud
 
 # JWT config (use environment vars in prod)
