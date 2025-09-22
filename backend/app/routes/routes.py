@@ -44,3 +44,20 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
     )
 
     return {"access_token": access_token, "token_type": "bearer"}
+
+#--------------------------------
+#Profile route
+# ------------------------------
+
+@router.get("/user/profile", response_model=UserResponse)
+def get_user_profile(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    if not current_user:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    db_user = crud.get_user_by_id(db, current_user.id)
+    if not db_user:
+        raise HTTPException(status_code=404, detail="User not found")
+    return db_user
+
