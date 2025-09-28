@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { getProfile } from "../utils/api";
 
 export default function Dashboard() {
@@ -9,20 +9,21 @@ export default function Dashboard() {
 
   useEffect(() => {
     async function fetchProfile() {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        navigate("/login");
-        return;
-      }
+      try {
+        const res = await getProfile();
 
-      const res = await getProfile();
-      if (res && res.email) {
-        setUser(res);
-      } else {
-        localStorage.removeItem("token"); // invalid/expired token
+        if (res?.email) {
+          setUser(res);
+        } else {
+          throw new Error("Invalid token");
+        }
+      } catch (err) {
+        console.error("Profile fetch failed:", err);
+        localStorage.removeItem("token");
         navigate("/login");
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     }
 
     fetchProfile();
@@ -33,10 +34,30 @@ export default function Dashboard() {
   return (
     <div className="dashboard">
       <h2>Dashboard</h2>
+
       {user ? (
         <>
-          <p>Welcome, {user.name || "User"}!</p>
+          <p>Welcome, <strong>{user.name || "User"}</strong>!</p>
           <p>Email: {user.email}</p>
+
+          <nav>
+            <ul>
+              <li><Link to="/webcam-drawing">🎨 Webcam Drawing</Link></li>
+              <li><Link to="/ai-drawing">🤖 AI Drawing</Link></li>
+              <li><Link to="/flipbook">📖 Flipbook</Link></li>
+              <li><Link to="/profile">👤 Profile</Link></li>
+            </ul>
+          </nav>
+
+          <button
+            onClick={() => {
+              localStorage.removeItem("token");
+              navigate("/login");
+            }}
+            style={{ marginTop: "20px" }}
+          >
+            Logout
+          </button>
         </>
       ) : (
         <p>Redirecting...</p>
