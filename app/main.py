@@ -23,4 +23,4 @@ app.add_middleware(
 )
 
 # Include routes
-app.include_router(routes.router, tags=["public"])
+app.include_router(routes.router, tags=["public"])      

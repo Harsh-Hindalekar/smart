@@ -61,3 +61,4 @@ def get_user_profile(
         raise HTTPException(status_code=404, detail="User not found")
     return db_user
 
+
