@@ -2,7 +2,6 @@ from pydantic import BaseModel, EmailStr
 from datetime import datetime
 from typing import Any, List, Optional
 
-
 # -----------------------------
 # User Schemas
 # -----------------------------
@@ -27,3 +26,10 @@ class UserResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+# -------------------------------------------------
+# Google AI Drawing Schema (NEW — required)
+# -------------------------------------------------
+class PointsRequest(BaseModel):
+    points: List[Any]
