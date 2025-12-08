@@ -1,6 +1,6 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
-from typing import List
+from typing import List, Optional
 from app.crud import crud
 from app.database import get_db
 from app.models.models import User
@@ -9,7 +9,7 @@ from datetime import timedelta
 from app.auth.auth import create_token
 from fastapi.security import OAuth2PasswordRequestForm
 from app.schemas.schemas import (UserCreate, UserLogin, UserResponse, PointsRequest)
-from app.services.google_ai import recognize_google   # NEW
+from app.services.google_ai import perfect_drawing, recognize_google   # NEW
 
 ACCESS_TOKEN_EXPIRE_MINUTES = 1080
 
@@ -55,16 +55,43 @@ def get_user_profile(
         raise HTTPException(status_code=404, detail="User not found")
     return db_user
 
+
 # -----------------------------
 # Google AI Drawing Recognition
 # -----------------------------
-@router.post("/recognize_google")
-async def recognize_google_shape(
-    req: PointsRequest,
-    current_user: User = Depends(get_current_user)
+@router.post("/ai/perfect-drawing")
+async def perfect_drawing_endpoint(
+    payload: PointsRequest,
+    smoothing_window: Optional[int] = Query(2, ge=0),
+    simplify_eps: Optional[float] = Query(2.0, ge=0.0)
 ):
-    result = await recognize_google(req.points)
-    return {
-        "predictions": result.get("recognized", []),
-        "top": result.get("recognized", [{}])[0] if result.get("recognized") else {}
-    }
+    """
+    Accepts a PointsRequest (points: List[{x,y}]) and returns a perfected drawing:
+    - smoothed_points
+    - recognized_as
+    - confidence
+    """
+    points = payload.points or []
+    if not points or len(points) < 3:
+        raise HTTPException(status_code=400, detail="Drawing too small. Draw more strokes.")
+
+    try:
+        result = await perfect_drawing(points, smoothing_window=smoothing_window, simplify_eps=simplify_eps)
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"AI service error: {str(e)}")
+
+@router.post("/ai/recognize-drawing")
+async def recognize_drawing_endpoint(payload: PointsRequest):
+    """
+    Returns raw recognition result from QuickDraw classify API.
+    """
+    points = payload.points or []
+    if not points:
+        raise HTTPException(status_code=400, detail="No drawing points provided")
+
+    try:
+        recognition = await recognize_google(points)
+        return recognition
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"AI recognition error: {str(e)}")

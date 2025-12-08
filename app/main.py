@@ -24,3 +24,6 @@ app.add_middleware(
 
 # Include routes
 app.include_router(routes.router, tags=["public"])      
+@app.get("/")
+def read_root():
+    return {"message": "Gesture API is running"}
