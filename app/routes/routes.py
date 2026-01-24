@@ -9,11 +9,12 @@ from datetime import timedelta
 from app.auth.auth import create_token
 from fastapi.security import OAuth2PasswordRequestForm
 from app.schemas.schemas import (UserCreate, UserLogin, UserResponse, PointsRequest)
-from app.services.google_ai import perfect_drawing, recognize_google   # NEW
-
+from app.routes.ai_drawing import router as ai_router
 ACCESS_TOKEN_EXPIRE_MINUTES = 1080
 
 router = APIRouter()
+
+router.include_router(ai_router, prefix="/ai", tags=["AI Drawing"])
 # -----------------------------
 # Register route 
 # -----------------------------
@@ -54,44 +55,3 @@ def get_user_profile(
     if not db_user:
         raise HTTPException(status_code=404, detail="User not found")
     return db_user
-
-
-# -----------------------------
-# Google AI Drawing Recognition
-# -----------------------------
-@router.post("/ai/perfect-drawing")
-async def perfect_drawing_endpoint(
-    payload: PointsRequest,
-    smoothing_window: Optional[int] = Query(2, ge=0),
-    simplify_eps: Optional[float] = Query(2.0, ge=0.0)
-):
-    """
-    Accepts a PointsRequest (points: List[{x,y}]) and returns a perfected drawing:
-    - smoothed_points
-    - recognized_as
-    - confidence
-    """
-    points = payload.points or []
-    if not points or len(points) < 3:
-        raise HTTPException(status_code=400, detail="Drawing too small. Draw more strokes.")
-
-    try:
-        result = await perfect_drawing(points, smoothing_window=smoothing_window, simplify_eps=simplify_eps)
-        return result
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"AI service error: {str(e)}")
-
-@router.post("/ai/recognize-drawing")
-async def recognize_drawing_endpoint(payload: PointsRequest):
-    """
-    Returns raw recognition result from QuickDraw classify API.
-    """
-    points = payload.points or []
-    if not points:
-        raise HTTPException(status_code=400, detail="No drawing points provided")
-
-    try:
-        recognition = await recognize_google(points)
-        return recognition
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"AI recognition error: {str(e)}")
